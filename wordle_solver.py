@@ -96,7 +96,7 @@ class WorldSolverMultiList:
 class WordleSolver():
 
     def __init__(self, word_list_file_path: str = None, word_length : int = 5, exclude_plurals:bool=True):
-        self.permitted_input_symbols = "+?_"
+        self.permitted_input_symbols = "gyb"
         self.word_list = []
         self.word_socres = {}
         self.word_symbol_combinations = {}
@@ -144,15 +144,15 @@ class WordleSolver():
         possible_word_lists = []
         for (word, symbol_pattern) in self.tries:
             for i in range(0, self.word_length):
-                if symbol_pattern[i] in ["+", "?"]:
+                if symbol_pattern[i] in ["g", "y"]:
                     self.included_letters += word[i]
-                    if symbol_pattern[i] == "+":
+                    if symbol_pattern[i] == "g":
                         right_spot_pattern_list = list(self.right_spot_pattern)
                         right_spot_pattern_list[i] = word[i]
                         self.right_spot_pattern = "".join(right_spot_pattern_list)
-                    elif symbol_pattern[i] == "?":
+                    elif symbol_pattern[i] == "y":
                         self.wrong_spot_pattern[i] += word[i]
-                elif symbol_pattern[i] == "_":
+                elif symbol_pattern[i] == "b":
                     if word[i] not in self.included_letters:
                         self.excluded_letters += word[i]
                     else:
@@ -296,7 +296,7 @@ class WordleSolver():
         if len(word) != self.word_length or len(result_symbols) != self.word_length:
             raise Exception("Word length or symbol length is invalid")
         if not all([character in string.ascii_lowercase for character in word]):
-            raise Exception("Word contains invalid character")
+            raise Exception("Word contains an invalid character")
         if not all([symbol in self.permitted_input_symbols for symbol in result_symbols]):
             raise Exception("Symbols contains an invalid symbol")
         self.tries.append((word, result_symbols))
@@ -322,18 +322,18 @@ if __name__ == "__main__":
     print(f"(Word length: {args.length}; Plurals: {'Yes' if args.plurals else 'No'})")
     print("Press CTRL+C to exit\n")
     print("Meanings of symbols:")
-    print(" +\tletter in the word and in the right spot (green box)")
-    print(" ?\tletter in the word but in a wrong spot (orange box)")
-    print(" _\tletter not in the word (grey box)\n")
+    print(" g\tletter in the word and in the right spot (green box)")
+    print(" y\tletter in the word but in a wrong spot (yellow box)")
+    print(" b\tletter not in the word (grey/black box)\n")
     print("Commands:")
-    print(" !done\t\tyou're done guessing a hidden word.  this will reset the state of the solver for you to guess a new hidden word")
-    print(" !tries\t\tsee the tries entered")
-    print(" !remove_last\tremove the last try entered\n")
+    print(" !done\t\tYou're done guessing a hidden word. This will reset the state of the solver for you to guess a new hidden word")
+    print(" !tries\t\tSee the tries entered")
+    print(" !remove_last\tRemove the last try entered\n")
 
     first_run = True
 
     while True:
-        print("Please enter you last try as word:symbols")
+        print("Please enter your last try as \n word:symbols")
         user_input = input().lower()
 
         reset = False
@@ -344,9 +344,9 @@ if __name__ == "__main__":
                 print("Invalid format")
                 continue
             if not all([len(value) == solver_multi.word_length for value in values]):
-                print("Invalid format: length of word or symbol is incorrect")
+                print("Invalid format: length of word or symbol is incorrect.")
                 continue
-            if values[1] == "+" * solver_multi.word_length:
+            if values[1] == "g" * solver_multi.word_length:
                 print("Great!")
                 reset = True
             else:
@@ -356,28 +356,28 @@ if __name__ == "__main__":
                     for conflict in conflicts:
                         print(f"{conflict[0]}: {conflict[1]}")
                     solver_multi.tries = solver_multi.tries[:-1]
-                    print("Your last try has been removed")
+                    print("Your last try has been removed.")
                     continue
         elif (user_input == "!done"):
             reset = True
         elif (user_input == "!remove_last"):
                 solver_multi.tries = solver_multi.tries[:-1]
-                print("Your last try has been removed")
+                print("Your last try has been removed.")
                 continue
         elif (user_input == "!tries"):
             if len(solver_multi.tries) <= 0:
-                print("No tries entered")
+                print("No tries entered.")
             else:
                 for i in range(0, len(solver_multi.tries)):
                     print(f"\tTry {i}: {solver_multi.tries[i]}")
             continue
         else:
-            print("Invalid input")
+            print("Invalid input.")
 
 
         if reset:
             solver_multi.reset()
-            print("The state is reset")
+            print("The state is reset.")
             continue
 
         suggested_words = solver_multi.get_suggested_words()
@@ -387,4 +387,4 @@ if __name__ == "__main__":
             for suggestion in suggested_words.words[:10]:
                 print(f"\t{suggestion}")
         else:
-            print("Sorry, no other possible words.  Please check the result symbols you entered.")
+            print("Sorry, no other possible words. Please check the symbols you entered.")
