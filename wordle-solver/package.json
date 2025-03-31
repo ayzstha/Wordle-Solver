@@ -1,0 +1,32 @@
+wordle-solver
+├── src
+│   ├── lib
+│   │   ├── solver.ts
+│   │   ├── dictionary.ts
+│   │   └── utils.ts
+│   ├── tests
+│   │   ├── solver.test.ts
+│   │   └── dictionary.test.ts
+│   └── types
+│       └── index.ts
+├── data
+│   └── words.txt
+├── package.json
+{
+  "name": "wordle-solver",
+  "version": "1.0.0",
+  "description": "A Wordle solver application",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "chai": "^4.3.4"
+  },
+  "devDependencies": {
+    "mocha": "^9.1.3"
+  }
+}
+├── tsconfig.json
+├── LICENSE
+└── README.md
