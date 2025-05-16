@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wordle Solver</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #121213;
+            color: #ffffff;
+            text-align: center;
+            padding: 2em;
+        }
+
+        h1 {
+            margin-bottom: 1em;
+        }
+
+        form {
+            margin-bottom: 2em;
+        }
+
+        .tile-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1em;
+        }
+
+        .tile {
+            width: 50px;
+            height: 50px;
+            margin: 0.2em;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #3a3a3c;
+            background-color: #3a3a3c;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .tile.yellow { background-color: #b59f3b; }
+        .tile.green { background-color: #538d4e; }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 260px;
+            text-transform: uppercase;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 1em;
+            cursor: pointer;
+        }
+
+        ul { list-style-type: none; padding: 0; }
+        li { margin: 4px 0; }
+    </style>
+</head>
+<body>
+
+    <h1>Wordle Solver</h1>
+
+    <form method="POST" id="guess-form">
+        <input type="text" id="word-input" name="word" maxlength="5" required placeholder="Enter your word" />
+        <div class="tile-row" id="tile-row">
+            <!-- 5 tiles -->
+            <div class="tile" data-index="0">A</div>
+            <div class="tile" data-index="1">I</div>
+            <div class="tile" data-index="2">S</div>
+            <div class="tile" data-index="3">L</div>
+            <div class="tile" data-index="4">E</div>
+        </div>
+        <input type="hidden" name="result" id="result-input" />
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if conflicts %}
+    <div style="color: red;">
+        <h3>Conflicts Detected</h3>
+        <ul>
+            {% for letter, message in conflicts %}
+                <li>{{ letter }}: {{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <h3>Tries</h3>
+    <ul>
+        {% for word, result in tries %}
+            <li><strong>{{ word }}</strong>: {{ result }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Suggestions</h3>
+    <ul>
+        {% for word in suggestions %}
+            <li>{{ word }}</li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        const tiles = document.querySelectorAll(".tile");
+        const resultInput = document.getElementById("result-input");
+        const wordInput = document.getElementById("word-input");
+
+        const COLORS = ["gray", "yellow", "green"];
+        const SYMBOLS = { gray: "b", yellow: "y", green: "g" };
+
+        tiles.forEach(tile => {
+            tile.addEventListener("click", () => {
+                let current = tile.classList.contains("green") ? "green" :
+                              tile.classList.contains("yellow") ? "yellow" : "gray";
+                tile.classList.remove("gray", "yellow", "green");
+
+                let next = COLORS[(COLORS.indexOf(current) + 1) % COLORS.length];
+                tile.classList.add(next);
+            });
+        });
+
+        document.getElementById("guess-form").addEventListener("submit", (e) => {
+            let symbols = "";
+            tiles.forEach(tile => {
+                if (tile.classList.contains("green")) symbols += "g";
+                else if (tile.classList.contains("yellow")) symbols += "y";
+                else symbols += "b";
+            });
+            resultInput.value = symbols;
+        });
+
+        wordInput.addEventListener("input", () => {
+            const letters = wordInput.value.toUpperCase().split("");
+            tiles.forEach((tile, i) => {
+                tile.textContent = letters[i] || "";
+            });
+        });
+    </script>
+
+</body>
+</html>
